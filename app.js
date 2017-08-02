@@ -5,12 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var fs = require('fs');
+var async = require('async');
+var superagent = require('superagent');
 
 // 加载路由控制
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var types = require('./routes/typeinfo');
 var news = require('./routes/news');
+var books = require('./routes/books');
 
 // 创建项目实例
 var app = express();
@@ -55,6 +58,7 @@ app.all('*',function (req, res, next) {
 app.use('/users', users);
 app.use('/types', types);
 app.use('/news', news);
+app.use('/books', books);
 
 app.get('*', function(req, res) {
     const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8')
