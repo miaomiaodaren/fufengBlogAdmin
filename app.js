@@ -100,5 +100,9 @@ app.use(function(err, req, res, next) {
   });
 });
 
+
+// socket.io
+
+
 // 输出模型app
 module.exports = app;
