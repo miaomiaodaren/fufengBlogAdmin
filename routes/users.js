@@ -32,23 +32,7 @@ router.get('/login', function(req, res, next) {
     res.render('login1', { title: 'Express' });
 })
 router.get('/weixin', function(req, res, next) {
-    var signature = req.query.signature,
-        timestamp = req.query.timestamp,
-        nonce = req.query.nonce,
-        echostr = req.query.echostr,
-        token = 'fufengweixin';
-    var arrays = [token, timestamp, nonce];
-    arrays.sort();
-    var tempStr = arrays.join('');
-    const hashCode = crypto.createHash('sha1');
-    var resultCode = hashCode.update(tempStr, 'utf8').digest('hex');
-    console.info(resultCode, 22, signature, 333);
-    if(resultCode === signature) {
-        res.render('weixin', {title: echostr});
-    } else {
-        res.render('weixin', {title: 'woshifufeng'});
-    }
-    
+    res.render('weixin', {title: 'woshifufeng'});
 })
 
 //获取图形验证码

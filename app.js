@@ -15,6 +15,9 @@ var types = require('./routes/typeinfo');
 var news = require('./routes/news');
 var books = require('./routes/books');
 
+var config = require('./config/config.json');
+var wxutil = require('./common/wxutil.js');
+
 // 创建项目实例
 var app = express();
 
@@ -38,6 +41,8 @@ app.use(cookieParser());
 
 // 访问静态资源文件 这里是访问所有dist目录下的静态资源文件
 app.use(express.static(path.resolve(__dirname, './dist')))
+
+app.use(wxutil.sign(config));
 
 //allow custom header and CORS
 app.all('*',function (req, res, next) {
