@@ -4,23 +4,12 @@ var news = require('../models/news');
 var superagent = require('superagent');
 var http = require('http');
 
+import News from '../controller/news.js'
 //显示新闻列表
-router.get('/newslist', function(req, res, next) {
-    news.find().sort({_id: -1}).then(function(info) {
-        res.json(info);
-        return
-    })
-})
+router.get('/newslist', News.newslist);
 
 //通过http模块使得node.js成为中间件，用来现实接口中间模块处理平台。
-router.get('/aa', function(req, res) {
-    //.query('search=Manny&range=1..5')  or send({name: 1, page:2})  body  text
-    superagent.get('http://stapi.ppwhale.vip/api/Article/GetArticlePageInfo').query('channelId=1&categoryId=1&PageSize=2')
-   .end(function(err, sres) {
-        // console.log(sres.body);
-        res.json(sres.body);
-    })
-})
+router.get('/aa', News.midapiware);
 
 //添加新闻
 router.post('/addNews', function(req, res, next) {

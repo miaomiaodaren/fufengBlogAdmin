@@ -61,7 +61,7 @@ app.use('/news', news);
 app.use('/books', books);
 
 app.get('*', function(req, res) {
-    const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8')
+    const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8');
     res.send(html)
 })
 

@@ -6,16 +6,18 @@ var http = require('http');
 var captchapng = require('captchapng');
 var fs = require('fs');
 
+var crypto = require('crypto');
+
 /* 返回统一格式 */
 var resData = {};
 
-router.use(function(req,res,next){
-    responseData={
-        code:0,
-        message:''
-    }
-    next();
-});
+// router.use(function(req,res,next){
+//     responseData={
+//         code:0,
+//         message:''
+//     }
+//     next();
+// });
 
 /* GET users listing.
 router.get('/', function(req, res, next) {
@@ -28,6 +30,25 @@ router.get('/reginer', function(req, res, next) {
 });
 router.get('/login', function(req, res, next) {
     res.render('login1', { title: 'Express' });
+})
+router.get('/weixin', function(req, res, next) {
+    var signature = req.query.signature,
+        timestamp = req.query.timestamp,
+        nonce = req.query.nonce,
+        echostr = req.query.echostr,
+        token = 'fufengweixin';
+    var arrays = [token, timestamp, nonce];
+    arrays.sort();
+    var tempStr = arrays.join('');
+    const hashCode = crypto.createHash('sha1');
+    var resultCode = hashCode.update(tempStr, 'utf8').digest('hex');
+    console.info(resultCode, 22, signature, 333);
+    if(resultCode === signature) {
+        res.render('weixin', {title: echostr});
+    } else {
+        res.render('weixin', {title: 'woshifufeng'});
+    }
+    
 })
 
 //获取图形验证码
@@ -63,6 +84,7 @@ router.all('/Getlogin', function(req, res, next) {
         res.json(resData);
         return
     };
+    console.log(req.cookies); console.log('3333');
     if(req.cookies.imgcode !== req.body.imgcode) {
         resData.message = '验证码错误！'
         resData.code = 2;
