@@ -5,7 +5,7 @@ class Users{
     constructor() {
         this.name = 'fufeng'
     }
-    getweixintoken(req, res, next) {
+    async getweixintoken(req, res, next) {
     	console.log('222222');
 	    if(req.query.code) {
 	    	console.info(req.query.code, '我是code')
