@@ -33,8 +33,9 @@ router.get('/reginer', function(req, res, next) {
 });
 router.get('/login', function(req, res, next) {
     res.render('login1', { title: 'Express' });
-})
+});
 router.get('/weixin', Users.getweixintoken);
+
 
 //获取图形验证码
 router.get('/GetImgCode', function(req, res, next) {
