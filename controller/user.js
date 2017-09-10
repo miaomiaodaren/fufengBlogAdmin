@@ -13,7 +13,7 @@ class Users{
 	        const usertoken = JSON.parse(weixintoken.text);
 	        console.info(usertoken, '我是token');
 	        const userinfo = await superagent.get('https://api.weixin.qq.com/sns/userinfo').query('access_token='+ usertoken.access_token +'openid=' + usertoken.openid + 'lang=zh_CN');
-	        console.info(userinfo, '我是得到的用户信息');
+	        console.info(userinfo.text, '我是得到的用户信息');
 	    }
 	    res.render('weixin', {title: 'woshifufeng'});
     }
