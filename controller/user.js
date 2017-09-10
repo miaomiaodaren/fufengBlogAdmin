@@ -11,9 +11,9 @@ class Users{
 	        const usertoken = JSON.parse(cnnodedata.text);
 	        const userinfo = await superagent.get('https://api.weixin.qq.com/sns/userinfo').query('access_token='+ usertoken.access_token +'openid=' + usertoken.openid + 'lang=zh_CN');
 	        console.info(userinfo);
-	        res.render('weixin', {title: 'woshifufeng', userinfos: userinfo});
+	        
 	    }
-	    res.render('weixin', {title: 'woshifufeng'});
+	    res.render('weixin', {title: 'woshifufeng', userinfos: userinfo || {} });
     }
 
 }
