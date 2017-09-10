@@ -7,6 +7,9 @@ var captchapng = require('captchapng');
 var fs = require('fs');
 
 var crypto = require('crypto');
+var superagent = require('superagent');
+
+import Users from '../controller/user.js'
 
 /* 返回统一格式 */
 var resData = {};
@@ -33,6 +36,9 @@ router.get('/login', function(req, res, next) {
 })
 router.get('/weixin', function(req, res, next) {
     console.info(req.query.code);
+    if(req.query.code) {
+        const weixintoken = await superagent.get('https://cnodejs.org/api/v1/topics').query('page=1&tab=ask&limit=5&mdrender=false');
+    }
     res.render('weixin', {title: 'woshifufeng'});
 })
 
