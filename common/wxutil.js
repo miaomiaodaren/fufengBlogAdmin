@@ -26,6 +26,7 @@ utils.sign = function(config) {
     		}
     		next();
     	}
+    }
 }
 
 module.exports = utils;
