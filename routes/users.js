@@ -32,6 +32,7 @@ router.get('/login', function(req, res, next) {
     res.render('login1', { title: 'Express' });
 })
 router.get('/weixin', function(req, res, next) {
+    console.info(req.query.code);
     res.render('weixin', {title: 'woshifufeng'});
 })
 
