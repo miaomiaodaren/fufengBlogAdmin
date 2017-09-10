@@ -1,5 +1,4 @@
 var User = require('../models/user');
-import config from '../config/config.json'
 
 class Users{
     constructor() {
@@ -15,4 +14,4 @@ class Users{
 
 }
 
-exports.isUser = new Users
+export default new Users()

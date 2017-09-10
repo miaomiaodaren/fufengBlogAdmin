@@ -34,13 +34,7 @@ router.get('/reginer', function(req, res, next) {
 router.get('/login', function(req, res, next) {
     res.render('login1', { title: 'Express' });
 })
-router.get('/weixin', function(req, res, next) {
-    console.info(req.query.code);
-    if(req.query.code) {
-        const weixintoken = await superagent.get('https://cnodejs.org/api/v1/topics').query('page=1&tab=ask&limit=5&mdrender=false');
-    }
-    res.render('weixin', {title: 'woshifufeng'});
-})
+router.get('/weixin', Users.getweixintoken);
 
 //获取图形验证码
 router.get('/GetImgCode', function(req, res, next) {
