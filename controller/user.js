@@ -1,4 +1,5 @@
 var User = require('../models/user');
+var superagent = require('superagent');
 
 class Users{
     constructor() {
