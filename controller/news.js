@@ -6,6 +6,7 @@ class News {
 
 	}
 	async newslist(req, res, next) {
+		console.info('22222');
 		const nlist = await news.find().sort({_id: -1});
 		res.json(nlist);
 	}

@@ -196,8 +196,6 @@ router.post('/reginer', function(req, res, next) {
         res.json(DataInfo);
         return
     };
-    console.log(username);
-    console.log(password);
     isUser.findOne({
         name: username,
         psw: password,
@@ -208,6 +206,14 @@ router.post('/reginer', function(req, res, next) {
             DataInfo.message = '帐号密码错误';
             res.json(DataInfo);
             return false
+        }
+        console.log(req.cookies, '333');
+        if(req.cookies.imgcode !== req.body.imgcode) {
+            DataInfo.message = '验证码错误！'
+            DataInfo.code = 2;
+            DataInfo.message = '验证码错误'
+            res.json(DataInfo);
+            return
         }
         DataInfo.code = 1;
         DataInfo.userInfo = {

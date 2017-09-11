@@ -18,12 +18,10 @@ utils.sign = function(config) {
     		if(resultCode === signature) {
     			res.send(echostr)
     		} else {
-    			res.send('err')
+    			// res.send('err1')
+                next();
     		}
     	} else if(req.method == 'POST') {
-    		if(resultCode != signature) {
-    			return
-    		}
     		next();
     	}
     }
