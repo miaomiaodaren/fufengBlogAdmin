@@ -41,7 +41,10 @@ router.get('/weixin', Users.getweixintoken);
 router.get('/GetImgCode', function(req, res, next) {
     var codes = parseInt(Math.random()*9000+1000);
     var p = new captchapng(80, 30, codes); // width,height,numeric captcha
-    res.cookie('imgcode', codes);
+    // res.cookie('imgcode', codes, { maxAge: 900000, httpOnly: true, domain: 'localhost:8388'});
+    res.cookie('imgcode', codes, { maxAge: 900000, httpOnly: true});
+    console.log(codes, '222');
+    console.info(req.cookies.imgcode, '3333');
     p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
     p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
 
@@ -51,7 +54,50 @@ router.get('/GetImgCode', function(req, res, next) {
         'Content-Type': 'image/png'
     });
     res.end(imgbase64);
-})
+});
+
+//用户登录
+router.post('/reginer', function(req, res, next) {
+    var DataInfo = {};
+    var username = req.body.name || req.query.name;
+    var password = req.body.psw || req.query.psw;
+    var imgcode = req.body.imgcode || req.query.imgcode;
+    if(username == '' || password == '') {
+        DataInfo.code = 2;
+        DataInfo.message = '帐号密码不能为空'
+        res.json(DataInfo);
+        return
+    };
+    isUser.findOne({
+        name: username,
+        psw: password,
+    }).then(function(info) {
+        console.log(info);
+        if(!info) {
+            DataInfo.code = 2;
+            DataInfo.message = '帐号密码错误';
+            res.json(DataInfo);
+            return false
+        }
+        console.log(req.cookies.imgcode, '444');
+        if(req.cookies.imgcode !== imgcode) {
+            DataInfo.message = '验证码错误！'
+            DataInfo.code = 2;
+            DataInfo.message = '验证码错误'
+            res.json(DataInfo);
+            return
+        }
+        DataInfo.code = 1;
+        DataInfo.userInfo = {
+            _id: info._id,
+            username: info.username
+        },
+        // req.session.User = DataInfo.userInfo;
+        DataInfo.message= '用户登录成功';
+        res.json(DataInfo);
+        return
+    })
+});
 
 //用户注册(同时兼容GET/POST二种接口)
 router.all('/Getlogin', function(req, res, next) {
@@ -71,6 +117,7 @@ router.all('/Getlogin', function(req, res, next) {
         return
     };
     console.log(req.cookies); console.log('3333');
+
     if(req.cookies.imgcode !== req.body.imgcode) {
         resData.message = '验证码错误！'
         resData.code = 2;
@@ -183,48 +230,6 @@ router.post('/UpdateUser', function(req, res, next) {
         return
     }
 
-})
-
-//用户登录
-router.post('/reginer', function(req, res, next) {
-    var DataInfo = {};
-    var username = req.body.name || req.query.name;
-    var password = req.body.psw || req.query.psw;
-    if(username == '' || password == '') {
-        DataInfo.code = 2;
-        DataInfo.message = '帐号密码不能为空'
-        res.json(DataInfo);
-        return
-    };
-    isUser.findOne({
-        name: username,
-        psw: password,
-    }).then(function(info) {
-        console.log(info);
-        if(!info) {
-            DataInfo.code = 2;
-            DataInfo.message = '帐号密码错误';
-            res.json(DataInfo);
-            return false
-        }
-        console.log(req.cookies, '333');
-        if(req.cookies.imgcode !== req.body.imgcode) {
-            DataInfo.message = '验证码错误！'
-            DataInfo.code = 2;
-            DataInfo.message = '验证码错误'
-            res.json(DataInfo);
-            return
-        }
-        DataInfo.code = 1;
-        DataInfo.userInfo = {
-            _id: info._id,
-            username: info.username
-        },
-        // req.session.User = DataInfo.userInfo;
-        DataInfo.message= '用户登录成功';
-        res.json(DataInfo);
-        return
-    })
 })
 
 module.exports = router;
