@@ -6,6 +6,4 @@ var NewsSchema = new Schema({
     content: String,
     addtime: String,
 });
-
-
 module.exports = mongodb.mongoose.model("News", NewsSchema);

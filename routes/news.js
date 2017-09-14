@@ -11,6 +11,8 @@ router.get('/newslist', News.newslist);
 //通过http模块使得node.js成为中间件，用来现实接口中间模块处理平台。
 router.get('/aa', News.midapiware);
 
+router.post('/search', News.serachnews);
+
 //添加新闻
 router.post('/addNews', function(req, res, next) {
     var datainfo = {};
