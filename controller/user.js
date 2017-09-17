@@ -16,7 +16,7 @@ class Users{
 	        console.info(userinfo.text, '我是得到的用户信息');
 	        console.info('我要发送修改消息模板了！');
 	        const gethy = await superagent.get('https://api.weixin.qq.com/cgi-bin/template/get_industry').query('access_token=' + token);
-	        console.info(gethy, '我是行业');
+	        console.info(gethy.text, '我是行业');
 	    }
 	    res.render('weixin', {title: 'woshifufeng'});
     }

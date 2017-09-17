@@ -6,7 +6,7 @@ var http = require('http');
 
 import News from '../controller/news.js'
 //显示新闻列表
-router.get('/newslist', News.newslist);
+router.all('/newslist', News.newslist);
 
 //通过http模块使得node.js成为中间件，用来现实接口中间模块处理平台。
 router.get('/aa', News.midapiware);

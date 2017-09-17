@@ -6,8 +6,9 @@ class News {
 
 	}
 	async newslist(req, res, next) {
-		console.info('22222');
-		const nlist = await news.find().sort({_id: -1});
+		let params = req.method == 'POST' ? req.body : req.query;
+		console.info(params, '2222');
+		const nlist = await news.find(params).sort({_id: -1});
 		res.json(nlist);
 	}
 	async midapiware(req, res, next) {
@@ -23,7 +24,7 @@ class News {
 			res.json(datainfo);
 			return
 		}
-		const searchjg = await news.find({content: {$regex: s_value, $options: "$i"}});
+		const searchjg = await news.find({$or: [{title: {$regex: s_value, $options: "$i"}}, {content: {$regex: s_value, $options: "$i"}}] });
 		res.json(searchjg);
 	}
 }
