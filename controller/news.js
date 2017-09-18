@@ -7,7 +7,7 @@ class News {
 	}
 	async newslist(req, res, next) {
 		let params = req.method == 'POST' ? req.body : req.query;
-		console.info(params, '2222');
+		console.info(params, 'nishishabi');
 		const nlist = await news.find(params).sort({_id: -1});
 		res.json(nlist);
 	}
