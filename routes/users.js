@@ -36,6 +36,8 @@ router.get('/login', function(req, res, next) {
 });
 router.get('/weixin', Users.getweixintoken);
 
+//图片上传尝试
+router.post('/uploader', Users.imgUploader);
 
 //获取图形验证码
 router.get('/GetImgCode', function(req, res, next) {

@@ -14,42 +14,6 @@ router.get('/aa', News.midapiware);
 router.post('/search', News.serachnews);
 
 //添加新闻
-router.post('/addNews', function(req, res, next) {
-    var datainfo = {};
-    var title = req.body.title;
-    var type = req.body.type;
-    var content = req.body.content;
-    var addtime = new Date();
-    if(!title) {
-        datainfo.code = 2;
-        datainfo.message = '标题不能为空';
-        res.json(datainfo);
-        return
-    }
-    if(!type) {
-        datainfo.code = 2;
-        datainfo.message = '类别不能为空';
-        res.json(datainfo);
-        return
-    }
-    if(!content) {
-        datainfo.code = 2;
-        datainfo.message = '内容不能为空';
-        res.json(datainfo);
-        return
-    }
-    var addnew = new news({
-        title: title,
-        type: type,
-        content: content,
-        addtime: addtime
-    });
-    addnew.save().then(function() {
-        datainfo.code = 1;
-        datainfo.message = '新闻发布成功';
-        res.json(datainfo);
-        return
-    })
-})
+router.post('/addNews', News.addNews);
 
 module.exports = router;

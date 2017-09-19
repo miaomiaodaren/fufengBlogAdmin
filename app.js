@@ -44,7 +44,7 @@ app.use(express.static(path.resolve(__dirname, './dist')))
 
 app.use(wxutil.sign(config));
 
-//allow custom header and CORS
+//allow custom header and CORS 让options请求快速返回
 app.all('*',function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Credentials', 'true');
@@ -52,12 +52,13 @@ app.all('*',function (req, res, next) {
     res.header('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
 
     if (req.method == 'OPTIONS') {
-        res.send(200); /让options请求快速返回/
+        res.send(200); 
     }
     else {
         next();
     }
 });
+
 
 
 // 匹配路径和路由
@@ -109,6 +110,8 @@ app.use(function(err, req, res, next) {
 
 
 // socket.io
+
+
 
 
 // 输出模型app

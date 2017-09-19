@@ -1,5 +1,6 @@
 var User = require('../models/user');
 var superagent = require('superagent');
+// import muilter from '../common/multerUtil';
 
 class Users{
     constructor() {
@@ -19,7 +20,10 @@ class Users{
 	        console.info(gethy.text, '我是行业');
 	    }
 	    res.render('weixin', {title: 'woshifufeng'});
-    }
+	}
+	async imgUploader(req, res, next) {
+		// console.info(req.body, '33333');
+	}
 
 }
 
