@@ -8,7 +8,6 @@ const path = require('path');
 const request = require('request');
 const fs = require('fs');
 
-
 // var books = require('../models/books');
 import { Books, BooksType } from '../models/books';
 import anBooks from '../controller/books.js'
@@ -76,24 +75,7 @@ router.post('/getZlist', function(req, res, next) {
 })
 
 //获取指定章内容
-router.post('/showcontent', function(req, res, next) {
-    var ids = req.body.id;
-    var _ids = req.body._id;
-    if(ids && _ids) {
-        Books.aggregate([
-            {$unwind: "$zview"},
-            {$match: {"zview.id": parseInt(ids)}},      //不转换成类型会出错
-            {$project: {_id: _ids, "zview": 1}}
-        ])
-        // books.find({'zview.id': ids}, {"zview.$": 1, _id: '59814025e51a2412b49d1aa0'})
-            .then(function(info) {
-            res.json(info)
-            return
-        }).catch(function(err) {
-            console.log(err)
-        })
-    }
-})
+router.post('/showcontent', anBooks.GetContentById)
 
 router.get('/deleteBook', function(req, res, next) {
     books.remove({}).then(function() {

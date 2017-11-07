@@ -41,6 +41,7 @@ app.use(cookieParser());
 
 // 访问静态资源文件 这里是访问所有dist目录下的静态资源文件
 app.use(express.static(path.resolve(__dirname, './dist')))
+app.use(express.static(path.resolve(__dirname, './bkdist')))
 
 app.use(wxutil.sign(config));
 
@@ -67,6 +68,12 @@ app.use('/users', users);
 app.use('/types', types);
 app.use('/news', news);
 app.use('/books', books);
+
+//假如在访问/b 开头的路由的时候，匹配小说网站的
+app.get('/book', function(req, res) {
+    const html = fs.readFileSync(path.resolve(__dirname, './bkdist/index.html'), 'utf-8');
+    res.send(html);
+})
 
 app.get('*', function(req, res) {
     const html = fs.readFileSync(path.resolve(__dirname, './dist/index.html'), 'utf-8');
