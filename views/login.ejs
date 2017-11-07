@@ -2,4 +2,16 @@
         帐号<%= title %> <input type="text" name="name">
         密码1 <input type="password" name="psd">
         <p id="loging">注册</p>
+        <div id="aa"></div>
+<script>
+    function aa() {
+        fetch('../news/newslist').then(function(res) {
+            return res.json();
+        }).then(function(data) {
+            console.info(data);
+            document.getElementById('aa').innerHTML = data[0].content
+        }) 
+    }
+    aa();
+</script>
 <% include ./include/footer.ejs %>
