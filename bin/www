@@ -33,11 +33,11 @@ var server = http.createServer(app);
 
 //在线用户
 let onlineUser = {}, onlineCount = 0;
+let justUser = {};
 
 var io = require('socket.io')(server);
 io.on('connection', function (socket) {
     socket.on('login', function( obj ) {
-        console.log('新用户登录', obj);
         socket.name = obj.userId;
         if(!Object.keys(onlineUser).includes(obj.userId)) {
             onlineUser[obj.userId] = obj.userName;
@@ -76,6 +76,7 @@ io.on('connection', function (socket) {
     socket.on('justdata', function(obj) {
         let v = 0,
         st = setInterval(() => {
+            if(v > 20) { window.clearInterval(st) }
             v++
             io.emit('justdata', v);
         }, 1000);

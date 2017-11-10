@@ -1,5 +1,11 @@
+import { request } from 'http';
+
+
 var User = require('../models/user');
 var superagent = require('superagent');
+var fs = require('fs');
+
+
 // import muilter from '../common/multerUtil';
 
 class Users{
@@ -21,8 +27,22 @@ class Users{
 	    }
 	    res.render('weixin', {title: 'woshifufeng'});
 	}
+
+
+
+
+
+
+
+
+
+
+
+	//初版用户头像上传，效果实现
 	async imgUploader(req, res, next) {
-		// console.info(req.body, '33333');
+		console.info(req, '111');
+		res.json({image: req.file.path});
+		// res.json({data: 'success'});
 	}
 
 }

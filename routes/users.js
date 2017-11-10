@@ -9,7 +9,14 @@ var fs = require('fs');
 var crypto = require('crypto');
 var superagent = require('superagent');
 
+
+
+// //在文件上传的时候需要使用的中间件, 可以使用req.files读取到数据信息
+// var multipart = require('connect-multiparty');
+// var multipartMiddleware = multipart();
+
 import Users from '../controller/user.js'
+import uploads from '../common/multerUtil';
 
 /* 返回统一格式 */
 var resData = {};
@@ -37,7 +44,7 @@ router.get('/login', function(req, res, next) {
 router.get('/weixin', Users.getweixintoken);
 
 //图片上传尝试
-router.post('/uploader', Users.imgUploader);
+router.post('/uploader', uploads.single('file'), Users.imgUploader);
 
 //获取图形验证码
 router.get('/GetImgCode', function(req, res, next) {
