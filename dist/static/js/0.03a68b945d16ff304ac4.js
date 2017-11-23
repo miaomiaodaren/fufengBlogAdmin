@@ -1,0 +1,2 @@
+webpackJsonp([0],{455:function(e,n){e.exports={render:function(){var e=this,n=e.$createElement;return(e._self._c||n)("router-view",{attrs:{name:"page"}})},staticRenderFns:[]}},54:function(e,n,t){var r=t(22)(null,t(455),null,null,null);e.exports=r.exports}});
+//# sourceMappingURL=0.03a68b945d16ff304ac4.js.map

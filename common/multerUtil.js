@@ -14,6 +14,5 @@ let storage = muletr.diskStorage({
 
 export default muletr({
     storage: storage,
-    dest: './public/uploads'
     // limits: {}
 })
