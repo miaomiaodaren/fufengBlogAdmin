@@ -33,7 +33,7 @@ var server = http.createServer(app);
 
 //在线用户
 let onlineUser = {}, onlineCount = 0;
-let justUser = {};
+let justUser = {}, userId = [];
 
 var io = require('socket.io')(server);
 io.on('connection', function (socket) {
@@ -51,7 +51,7 @@ io.on('connection', function (socket) {
     })
     //监听用户退出
     socket.on('disconnect',function () {
-        console.info(socket.name, '123123123');
+        console.info('123123123', socket.id, Date.now());
         //将退出用户在在线列表删除
         if(Object.keys(onlineUser).includes(socket.name)){
             //退出用户信息
@@ -74,12 +74,8 @@ io.on('connection', function (socket) {
     });
 
     socket.on('justdata', function(obj) {
-        let v = 0,
-        st = setInterval(() => {
-            if(v > 20) { window.clearInterval(st) }
-            v++
-            io.emit('justdata', v);
-        }, 1000);
+        console.info(obj, '111', Date.now());
+        socket.id = obj.id
     })
 });
 
