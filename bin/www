@@ -9,7 +9,7 @@
 var app = require('../app');
 var debug = require('debug')('nodejs-demo:server');
 var http = require('http');
-
+const url = require('url');
 /**
  * Get port from environment and store in Express.
  */
@@ -32,51 +32,72 @@ var server = http.createServer(app);
  */
 
 //在线用户
-let onlineUser = {}, onlineCount = 0;
-let justUser = {}, userId = [];
+// let onlineUser = {}, onlineCount = 0;
+// let justUser = {}, userId = [];
 
-var io = require('socket.io')(server);
-io.on('connection', function (socket) {
-    socket.on('login', function( obj ) {
-        socket.name = obj.userId;
-        if(!Object.keys(onlineUser).includes(obj.userId)) {
-            onlineUser[obj.userId] = obj.userName;
-            //在线人数+1
-            onlineCount++;
-        }
-        console.info(onlineUser, 'woshiuser', onlineCount, 'woshicount');
-        //广播消息
-        io.emit('login', {onlineUser: onlineUser, onlineCount: onlineCount, user: obj}, 'login');
-        console.log(obj.userName + "加入了聊天室");
-    })
-    //监听用户退出
-    socket.on('disconnect',function () {
-        console.info('123123123', socket.id, Date.now());
-        //将退出用户在在线列表删除
-        if(Object.keys(onlineUser).includes(socket.name)){
-            //退出用户信息
-            var obj= { userid: socket.name, username: onlineUser[socket.name] };
-            //删除
-            delete onlineUser[socket.name];
-            //在线人数-1
-            onlineCount--;
-            //广播消息
-            io.emit('logout', {onlineUser: onlineUser, onlineCount: onlineCount, user: obj}, 'logout');
-            console.log(obj.username + "退出了聊天室");
-        }
-    })
-    //监听用户发布聊天内容
-    socket.on('message', function(obj) {
-        console.info('收到用户发送的消息', obj);
-        //向所有客户端广播发布的消息
-        io.emit('message', obj);
-        console.log(obj.username + '说：' + obj.content);
+
+// var io = require('socket.io')(server);
+
+// io.on('connection', function (socket) {
+//     console.info('connetcion' + socket)
+//     socket.emit('news', {hello: 'world'});
+//     socket.on('login', function(data) {
+//         console.info(data, '连接上了');
+//     })
+//     socket.on('login', function( obj ) {
+//         socket.name = obj.userId;
+//         if(!Object.keys(onlineUser).includes(obj.userId)) {
+//             onlineUser[obj.userId] = obj.userName;
+//             //在线人数+1
+//             onlineCount++;
+//         }
+//         console.info(onlineUser, 'woshiuser', onlineCount, 'woshicount');
+//         //广播消息
+//         io.emit('login', {onlineUser: onlineUser, onlineCount: onlineCount, user: obj}, 'login');
+//         console.log(obj.userName + "加入了聊天室");
+//     })
+//     //监听用户退出
+//     socket.on('disconnect',function () {
+//         console.info('123123123', socket.id, Date.now());
+//         //将退出用户在在线列表删除
+//         if(Object.keys(onlineUser).includes(socket.name)){
+//             //退出用户信息
+//             var obj= { userid: socket.name, username: onlineUser[socket.name] };
+//             //删除
+//             delete onlineUser[socket.name];
+//             //在线人数-1
+//             onlineCount--;
+//             //广播消息
+//             io.emit('logout', {onlineUser: onlineUser, onlineCount: onlineCount, user: obj}, 'logout');
+//             console.log(obj.username + "退出了聊天室");
+//         }
+//     })
+//     //监听用户发布聊天内容
+//     socket.on('message', function(obj) {
+//         console.info('收到用户发送的消息', obj);
+//         //向所有客户端广播发布的消息
+//         io.emit('message', obj);
+//         console.log(obj.username + '说：' + obj.content);
+//     });
+
+//     socket.on('justdata', function(obj) {
+//         console.info(obj, '111', Date.now());
+//         socket.id = obj.id
+//     })
+// });
+
+const WebSocket = require('ws').Server;
+const wss = new WebSocket({ server });
+wss.on('connection', function(ws, req) {
+    const url = req.url;
+    console.info(ws, '连接成功');
+    ws.on('message', function incoming(message) {
+        console.info('接受消息', message);
     });
-
-    socket.on('justdata', function(obj) {
-        console.info(obj, '111', Date.now());
-        socket.id = obj.id
-    })
+    ws.send('something');
+    ws.on('close', function (e) {
+        console.log('断开连接', e);
+    });
 });
 
 /**
@@ -88,6 +109,7 @@ io.on('connection', function (socket) {
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+
 
 /**
  * Normalize a port into a number, string, or false.
