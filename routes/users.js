@@ -9,11 +9,14 @@ var fs = require('fs');
 var crypto = require('crypto');
 var superagent = require('superagent');
 
+var multer  = require('multer');
+var upload = multer({ dest: '../public/uploads/' });
 
 
 // //在文件上传的时候需要使用的中间件, 可以使用req.files读取到数据信息
 // var multipart = require('connect-multiparty');
 // var multipartMiddleware = multipart();
+
 
 import Users from '../controller/user.js'
 import uploads from '../common/multerUtil';
@@ -45,6 +48,9 @@ router.get('/weixin', Users.getweixintoken);
 
 //图片上传尝试
 router.post('/uploader', uploads.single('file'), Users.imgUploader);
+
+//用户注册(同时兼容GET/POST二种接口)
+router.all('/UserReginer', Users.reginer);
 
 //获取图形验证码
 router.get('/GetImgCode', function(req, res, next) {
@@ -81,14 +87,12 @@ router.post('/reginer', function(req, res, next) {
         name: username,
         psw: password,
     }).then(function(info) {
-        console.log(info);
         if(!info) {
             DataInfo.code = 2;
             DataInfo.message = '帐号密码错误';
             res.json(DataInfo);
             return false
         }
-        console.log(req.cookies.imgcode, '444');
         if(req.cookies.imgcode !== imgcode) {
             DataInfo.message = '验证码错误！'
             DataInfo.code = 2;
@@ -99,7 +103,7 @@ router.post('/reginer', function(req, res, next) {
         DataInfo.code = 1;
         DataInfo.userInfo = {
             _id: info._id,
-            username: info.username
+            username: info.name
         },
         // req.session.User = DataInfo.userInfo;
         DataInfo.message= '用户登录成功';
@@ -108,62 +112,67 @@ router.post('/reginer', function(req, res, next) {
     })
 });
 
-//用户注册(同时兼容GET/POST二种接口)
-router.all('/Getlogin', function(req, res, next) {
-    var param = '';
-    console.log(req.body);
-    if(req.method == 'POST') {
-        param = req.body;
-    } else {
-        param = req.query || req.params;
-    }
-    var username = param.name;
-    var password = param.psw;
-    if(username == '' || password == '') {
-        resData.code = 2;
-        resData.message = '帐号密码不能为空'
-        res.json(resData);
-        return
-    };
-    console.log(req.cookies); console.log('3333');
 
-    if(req.cookies.imgcode !== req.body.imgcode) {
-        resData.message = '验证码错误！'
-        resData.code = 2;
-        resData.message = '验证码错误'
-        res.json(resData);
-        return
-    }
+// router.all('/Getlogin', function(req, res, next) {
+//     var param = '';
+//     console.log(req.body);
+//     if(req.method == 'POST') {
+//         param = req.body;
+//     } else {
+//         param = req.query || req.params;
+//     }
+//     var username = param.name;
+//     var password = param.psw;
+//     if(username == '' || password == '') {
+//         resData.code = 2;
+//         resData.message = '帐号密码不能为空'
+//         res.json(resData);
+//         return
+//     };
+//     console.log(req.cookies); console.log('3333');
+
+//     if(req.cookies.imgcode !== req.body.imgcode) {
+//         resData.message = '验证码错误！'
+//         resData.code = 2;
+//         resData.message = '验证码错误'
+//         res.json(resData);
+//         return
+//     }
     
-    isUser.findOne({
-        name: username
-    }).then(function(userInfo) {
-        console.log(userInfo);
-        if(userInfo) {
-            resData.code = 2;
-            resData.message = '用户已经存在'
-            res.json(resData);
-            return
-        } else {
-            var user = new isUser({
-                name: username,
-                psw: password,
-            });
-        }
-        return user.save();
-    }).then(function() {
-        resData.code = 1;
-        resData.message = '用户注册成功'
-        res.json(resData);
-        return
-    })
-});
+//     isUser.findOne({
+//         name: username
+//     }).then(function(userInfo) {
+//         console.log(userInfo);
+//         if(userInfo) {
+//             resData.code = 2;
+//             resData.message = '用户已经存在'
+//             res.json(resData);
+//             return
+//         } else {
+//             var user = new isUser({
+//                 name: username,
+//                 psw: password,
+//             });
+//         }
+//         return user.save();
+//     }).then(function() {
+//         resData.code = 1;
+//         resData.message = '用户注册成功'
+//         res.json(resData);
+//         return
+//     })
+// });
 
 //获取所有的用户列表 sort -1为倒序, 1为正序
-router.post('/GetAllUser', function(req, res, next) {
-    isUser.find().sort({_id: -1}).then(function(DataInfo) {
-        res.json(DataInfo);
-        return
+router.all('/GetAllUser', function(req, res, next) {
+    let DataInfo = {};
+    isUser.find().find({}).count().then(count => {
+        isUser.find().sort({_id: -1}).then(function(info) {
+            DataInfo.total = count || 0;
+            DataInfo.data = info;
+            res.json(DataInfo);
+            return
+        })
     })
 });
 

@@ -11,9 +11,30 @@ class News {
 		const nlist = await news.find({}).sort({_id: -1}).limit(10).skip(skip);
 		res.json(nlist);
 	}
-	async midapiware(req, res, next) {
-		const cnnodedata = await superagent.get('https://cnodejs.org/api/v1/topics').query('page=1&tab=ask&limit=5&mdrender=false');
-		res.send(JSON.parse(cnnodedata.text));
+	// async midapiware(req, res, next) {
+	// 	//曾经报过json格式的错误,所以要一定使用bodyParser.json()  https://kaifa.huaqiaobao.cn/manageApi/userType
+	// 	// const cnnodedata = await superagent.get('https://cnodejs.org/api/v1/topics').query('page=1&tab=ask&limit=5&mdrender=false');
+	// 	const cnnodedata = await superagent.post('http://api.ppwhale.com/Classes/Live/Controller/Live_Error_Release.ashx')
+	// 		.send({"userId": 346, "houseId": 14, "show_status": 2, "time": Date.parse(new Date())/1000});
+
+	// 	// superagent.post('http://api.ppwhale.com/Classes/Live/Controller/Live_Error_Release.ashx')
+	// 	// .send({userId:346, houseId: 14, show_status:2, time: Date.parse(new Date())/1000})
+	// 	// .set('Content-Type', 'application/json')
+	// 	// .end(function(rv){
+	// 	// 	console.info(rv, '数据插入成功');
+	// 	// 	res.send(rv);
+	// 	// })
+	// 	console.info(cnnodedata, 3333);
+	// 	res.send(cnnodedata.text);
+	// 	// res.send(JSON.parse(cnnodedata.text));
+	// }
+	midapiware(req, res, next) {
+		return superagent.post('http://api.ppwhale.com/Classes/Live/Controller/Live_Error_Release.ashx')
+		.send({userId:346, houseId: 14, show_status:2, time: Date.parse(new Date())/1000})
+		.set('Content-Type', 'application/json')
+		.end(function(err, rv){
+			console.info(rv.text)
+		})
 	}
 	async serachnews(req, res, next) {
 		let datainfo = {};

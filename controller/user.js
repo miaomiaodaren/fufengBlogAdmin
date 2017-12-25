@@ -40,9 +40,54 @@ class Users{
 
 	//初版用户头像上传，效果实现
 	async imgUploader(req, res, next) {
-		console.info(req, '111');
 		res.json({image: req.file.path});
 		// res.json({data: 'success'});
+	}
+
+	async reginer(req, res, next) {
+		const resData = {};
+		var param = '';
+	    if(req.method == 'POST') {
+	        param = req.body;
+	    } else {
+	        param = req.query || req.params;
+	    }
+	    var username = param.name;
+	    var password = param.psw;
+	    if(username == '' || password == '') {
+	        resData.code = 2;
+	        resData.message = '帐号密码不能为空'
+	        res.json(resData);
+	        return
+	    };
+	    // console.log(req.cookies); console.log('3333');
+
+	    // if(req.cookies.imgcode !== req.body.imgcode) {
+	    //     resData.message = '验证码错误！'
+	    //     resData.code = 2;
+	    //     resData.message = '验证码错误'
+	    //     res.json(resData);
+	    //     return
+	    // }
+	    const userInfo = await User.findOne({name: username});
+	    if(userInfo) {
+    	 	resData.code = 2;
+            resData.message = '用户已经存在'
+            res.json(resData);
+            return
+	    }
+    	const user = new User({
+            name: username,
+            psw: password,
+            isAdmin: req.body.isAdmin
+        });
+	    const addsuccer = await user.save();
+	    if(addsuccer) {
+	    	resData.code = 1;
+	        resData.message = '用户注册成功'
+	        res.json(resData);
+	        return
+	    }
 	}
 
 }

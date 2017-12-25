@@ -87,16 +87,32 @@ var server = http.createServer(app);
 // });
 
 const WebSocket = require('ws').Server;
-const wss = new WebSocket({ server });
+const wss = new WebSocket({ server, verifyClient: socketVerify });
+let userList = []; //用来存放当前连接的用户列表
+
+//进行验证
+function socketVerify(info) {
+    // console.info('我是验证的状态', info);
+    return true
+}
+//初始化连接
 wss.on('connection', function(ws, req) {
     const url = req.url;
-    console.info(ws, '连接成功');
-    ws.on('message', function incoming(message) {
-        console.info('接受消息', message);
+    const self = this;
+    // console.info(wss.clients, '我是连接人数');
+    //接收消息
+    ws.on('message', function(message) {
+        const obj = eval('(' + message + ')'); 
+        this.user = obj.id;
+        self.user = obj.id;
+        if(!userList.includes(this.user)){
+            userList.push(this.user)
+        }
     });
-    ws.send('something');
+    //发送消息
+    ws.send('你已连接成功');
     ws.on('close', function (e) {
-        console.log('断开连接', e);
+        console.log('断开连接', e, this.user, 333, self.user, 4444);
     });
 });
 

@@ -61,6 +61,10 @@ app.all('*',function (req, res, next) {
 });
 
 
+app.get('/aa', function(req, res, next) {
+    //res页面跳转  此页面用来实现原生的ajax. 在富文本编辑器功能实现之后实现ajax
+    res.render('index', { title: '1122' });
+})
 
 // 匹配路径和路由
 // app.use('/', routes);
