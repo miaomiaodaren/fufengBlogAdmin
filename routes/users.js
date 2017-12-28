@@ -52,6 +52,9 @@ router.post('/uploader', uploads.single('file'), Users.imgUploader);
 //用户注册(同时兼容GET/POST二种接口)
 router.all('/UserReginer', Users.reginer);
 
+//删除指定用户
+router.post('/RemoveUser', Users.removeUser);
+
 //获取图形验证码
 router.get('/GetImgCode', function(req, res, next) {
     var codes = parseInt(Math.random()*9000+1000);
@@ -176,36 +179,6 @@ router.all('/GetAllUser', function(req, res, next) {
     })
 });
 
-//删除指定用户
-router.post('/RemoveUser', function(req, res, next) {
-    var DataInfo = {};
-    var id = req.body.id;
-    if(id) {
-        isUser.findOne({
-            _id : id
-        }).then(function(info) {
-            if(!info) {
-                DataInfo.code = 2;
-                DataInfo.message = '该用户不存在';
-                res.json(DataInfo);
-                return
-            }
-            return isUser.remove({
-                _id: id
-            })
-        }).then(function(){
-            DataInfo.code = 1;
-            DataInfo.message = "用户删除成功";
-            res.json(DataInfo)
-            return
-        });
-    } else {
-        DataInfo.code = 2;
-        DataInfo.message = '参数不能为空'
-        res.json(DataInfo);
-        return
-    }
-});
 
 //更新用户数据
 router.post('/UpdateUser', function(req, res, next) {

@@ -44,6 +44,39 @@ class Users{
 		// res.json({data: 'success'});
 	}
 
+	//删除用户
+	async removeUser(req, res, next) {
+		var DataInfo = {};
+	    var id = req.body.id;
+	    if(id) {
+	        User.findOne({
+	            _id : id
+	        }).then(function(info) {
+	            if(!info) {
+	                DataInfo.code = 2;
+	                DataInfo.message = '该用户不存在';
+	                res.json(DataInfo);
+	                return
+	            }
+	            return User.remove({
+	                _id: id
+	            })
+	        }).then(function(){
+	            DataInfo.code = 1;
+	            DataInfo.message = "用户删除成功";
+	            res.json(DataInfo)
+	            return
+	        });
+	    } else {
+	        DataInfo.code = 2;
+	        DataInfo.message = '参数不能为空'
+	        res.json(DataInfo);
+	        return
+	    }
+	}
+
+
+	//用户注册
 	async reginer(req, res, next) {
 		const resData = {};
 		var param = '';
