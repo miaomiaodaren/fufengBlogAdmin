@@ -167,17 +167,7 @@ router.post('/reginer', function(req, res, next) {
 // });
 
 //获取所有的用户列表 sort -1为倒序, 1为正序
-router.all('/GetAllUser', function(req, res, next) {
-    let DataInfo = {};
-    isUser.find().find({}).count().then(count => {
-        isUser.find().sort({_id: -1}).then(function(info) {
-            DataInfo.total = count || 0;
-            DataInfo.data = info;
-            res.json(DataInfo);
-            return
-        })
-    })
-});
+router.all('/GetAllUser', Users.GetUsers);
 
 
 //更新用户数据

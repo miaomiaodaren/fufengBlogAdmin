@@ -44,6 +44,40 @@ class Users{
 		// res.json({data: 'success'});
 	}
 
+	//获取用户信息
+	async GetUsers(req, res, next) {
+		let DataInfo = {},
+			_id = req.body._id || req.query._id,
+			isAdmin = req.body.isAdmin || req.query.isAdmin,
+			name = req.body.name || req.query.name,
+			//在后台传入的参数中进行了一次赛选,把有值的参数进行重组。同时支持GET/POST
+			params = {};
+		['_id', 'isAdmin', 'name'].map(v => {
+			eval(v) ? params[v] = eval(v) : '';
+		});
+		const count = await User.find(params).count();
+		if(count) {
+			const info = await User.find(params).sort({_id: -1});
+		 	DataInfo.total = count || 0;
+            DataInfo.data = info;
+            res.json(DataInfo);
+            return
+		} else {
+			DataInfo.total = count || 0;
+            DataInfo.data = [];
+            res.json(DataInfo);
+            return
+		}
+	    // User.find({}).count().then(count => {
+	    //     isUser.find().sort({_id: -1}).then(function(info) {
+	    //         DataInfo.total = count || 0;
+	    //         DataInfo.data = info;
+	    //         res.json(DataInfo);
+	    //         return
+	    //     })
+	    // })
+	}
+
 	//删除用户
 	async removeUser(req, res, next) {
 		var DataInfo = {};
@@ -78,15 +112,13 @@ class Users{
 
 	//用户注册
 	async reginer(req, res, next) {
-		const resData = {};
-		var param = '';
-	    if(req.method == 'POST') {
-	        param = req.body;
-	    } else {
-	        param = req.query || req.params;
-	    }
-	    var username = param.name;
-	    var password = param.psw;
+		const resData = {},
+			param = req.method == 'POST' ? req.body : req.query || req.params,
+			username = param.name, 
+			password = param.psw,
+			method = param.method || '',
+			_id = param._id || '',
+			isAdmin = param.isAdmin || false;
 	    if(username == '' || password == '') {
 	        resData.code = 2;
 	        resData.message = '帐号密码不能为空'
@@ -102,24 +134,42 @@ class Users{
 	    //     res.json(resData);
 	    //     return
 	    // }
-	    const userInfo = await User.findOne({name: username});
-	    if(userInfo) {
-    	 	resData.code = 2;
-            resData.message = '用户已经存在'
-            res.json(resData);
-            return
-	    }
-    	const user = new User({
-            name: username,
-            psw: password,
-            isAdmin: req.body.isAdmin
-        });
-	    const addsuccer = await user.save();
-	    if(addsuccer) {
-	    	resData.code = 1;
-	        resData.message = '用户注册成功'
-	        res.json(resData);
-	        return
+	    //如果method传入了upadte则是更新用户
+	    if(method) {
+	    	const userInfo = await User.findOne({'_id': _id});
+	    	if(!userInfo) {
+	    		resData.code = 2;
+	            resData.message = '用户不存在'
+	            res.json(resData);
+	            return
+	    	}
+	    	const info = await User.update({'_id': _id}, {$set: {'name': username, 'psw': password, 'isAdmin': isAdmin}});
+	    	if(info) {
+		    	resData.code = 1;
+		        resData.message = '用户更新成功'
+		        res.json(info);
+		        return
+		    }
+	    } else {
+	    	const userInfo = await User.findOne({'name': username});
+		    if(userInfo) {
+	    	 	resData.code = 2;
+	            resData.message = '用户已经存在'
+	            res.json(resData);
+	            return
+		    }
+	    	const user = new User({
+	            name: username,
+	            psw: password,
+	            isAdmin: req.body.isAdmin
+	        });
+		    const addsuccer = await user.save();
+		    if(addsuccer) {
+		    	resData.code = 1;
+		        resData.message = '用户注册成功'
+		        res.json(resData);
+		        return
+		    }
 	    }
 	}
 
