@@ -16,4 +16,7 @@ router.post('/search', News.serachnews);
 //添加新闻
 router.post('/addNews', News.addNews);
 
+//删除新闻
+router.post('/delNews', News.delNews);
+
 module.exports = router;

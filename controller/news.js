@@ -6,10 +6,24 @@ class News {
 
 	}
 	async newslist(req, res, next) {
-		let params = req.method == 'POST' ? req.body : req.query;
-		const skip = params.page ? 10 * Number(params.page - 1) : 0;
-		const nlist = await news.find({}).sort({_id: -1}).limit(10).skip(skip);
+		const params = req.method == 'POST' ? req.body : req.query,
+			// skip = params.page ? 10 * Number(params.page - 1) : 0,
+			// {$or: [{title: {$regex: s_value, $options: "$i"}}, {content: {$regex: s_value, $options: "$i"}}] }
+			nlist = await news.find({...params}).sort({_id: -1}).limit(100).skip(0);
 		res.json(nlist);
+	}
+
+	//删除博客消息
+	async delNews(req, res, next) {
+		const _id = req.body._id || req.query._id;
+		if(_id) {
+			const info = await news.remove({'_id': _id});
+			if(info) {
+				res.json({code: 1, msg: '消息删除成功'});
+			}
+		} else {
+			res.json({msg: '缺少必要参数'});
+		}
 	}
 	// async midapiware(req, res, next) {
 	// 	//曾经报过json格式的错误,所以要一定使用bodyParser.json()  https://kaifa.huaqiaobao.cn/manageApi/userType

@@ -3,10 +3,19 @@ var router = express.Router();
 var typeinfo = require('../models/typeinfo');
 
 router.get('/GetTypes', function(req, res, next) {
-    typeinfo.find().then(function(info) {
-        res.json(info);
-        return
-    })
+    const datainfo = {};
+    typeinfo.find().count().then(function(count) {
+        if(count) {
+            datainfo['count'] = count;
+            typeinfo.find().then(function(info) {
+                datainfo['list'] = info;
+                res.json(datainfo);
+                return
+            })
+        } else {
+            res.json(datainfo);
+        }
+    });
 });
 
 router.post('/addTypes', function(req, res, next) {
