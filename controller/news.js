@@ -66,8 +66,8 @@ class News {
 		var title = req.body.title;
 		var type = req.body.type;
 		var content = req.body.content;
-		console.info(content);
 		var addtime = new Date();
+		var _id = req.body._id || void 0;
 		if(!title) {
 			res.json({
 				status: 0,
@@ -92,27 +92,45 @@ class News {
 			});
 			return
 		}
-		var addnew = new news({
-			title: title,
-			type: type,
-			content: content,
-			addtime: addtime
-		});
-		//使用try catch 可以有效监控数据是否出错
-		try {
-			await addnew.save();
-			res.json({
-				status: 1,
-				message: '新闻发布成功'
+		if(_id) {
+			const info = await news.update({'_id': _id}, {$set: {'title': title, 'type': type, 'content': content, 'addtime': addtime}});
+	    	if(info) {
+		        res.json({
+		        	status: 1,
+					type: 'SUCCESS_ADD_NEWS',
+					message: '添加新闻成功'
+		        });
+		        return
+		    } else {
+		    	res.json({
+		        	status: 2,
+					type: 'ERROR_ADD_NEWS',
+					message: '添加新闻失败'
+		        });
+		    }
+		} else {
+			var addnew = new news({
+				title: title,
+				type: type,
+				content: content,
+				addtime: addtime
 			});
-		} catch(err) {
-			res.json({
-				status: 0,
-				type: 'ERROR_ADD_NEWS',
-				message: '添加新闻失败'
-			});
-			return
-		};
+			//使用try catch 可以有效监控数据是否出错
+			try {
+				await addnew.save();
+				res.json({
+					status: 1,
+					message: '新闻发布成功'
+				});
+			} catch(err) {
+				res.json({
+					status: 0,
+					type: 'ERROR_ADD_NEWS',
+					message: '添加新闻失败'
+				});
+				return
+			};
+		}
 	}
 }
 
