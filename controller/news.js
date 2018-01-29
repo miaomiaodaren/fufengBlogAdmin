@@ -6,11 +6,23 @@ class News {
 
 	}
 	async newslist(req, res, next) {
-		const params = req.method == 'POST' ? req.body : req.query,
-			// skip = params.page ? 10 * Number(params.page - 1) : 0,
-			// {$or: [{title: {$regex: s_value, $options: "$i"}}, {content: {$regex: s_value, $options: "$i"}}] }
-			nlist = await news.find({...params}).sort({_id: -1}).limit(100).skip(0);
-		res.json(nlist);
+		const params = req.method == 'POST' ? req.body : req.query, pagelimit = 10;
+		let count, dateInfo = {}, skip;
+		if(params.page) {
+			skip = params.page ? 10 * Number(params.page - 1) : 0;    //skip 是指要跳过的条数，也就是第1页的话不用跳过前面的
+			delete params.page;
+		}
+		// {$or: [{title: {$regex: s_value, $options: "$i"}}, {content: {$regex: s_value, $options: "$i"}}] }
+		//如果没有加try catct 第一个ajax请求如果失败了，第二个不会触发，只有加了，第一个失败的时候，第二个还是触发
+		try {
+			count = await news.find({}).count();
+		} catch(err) {
+			res.json(err)
+			return
+		}
+		const nlist = await news.find({...params}).sort({_id: -1}).limit(pagelimit).skip(skip);
+		dateInfo['count'] = count;  dateInfo['information'] = nlist; dateInfo['page'] = req.body.page || 1;
+		res.json(dateInfo);
 	}
 
 	//删除博客消息
@@ -55,7 +67,7 @@ class News {
 		const s_value = req.body.value;
 		if(!s_value) {
 			datainfo.code = 1;
-			datainfo.information = '';
+			datainfo.information = [];
 			res.json(datainfo);
 			return
 		}

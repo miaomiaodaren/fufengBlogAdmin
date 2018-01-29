@@ -29,15 +29,6 @@ class Users{
 	}
 
 
-
-
-
-
-
-
-
-
-
 	//初版用户头像上传，效果实现
 	async imgUploader(req, res, next) {
 		res.json({image: req.file.path});
