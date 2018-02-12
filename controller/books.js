@@ -7,19 +7,39 @@ class anBooks {
     constructor() {
 
     }
-    //显示所有的小说数据
+    //显示所有的小说数据  .pretty() 格式化输出
     async getBookList(req, res, next) {
         try {
-            let booklist = await Books.find({}, {"title": 1, "_id": 1});
+            let booklist = await Books.find({}, {"title": 1, "author": 1, "type": 1, "addtime": 1,"_id": 1});
+            console.info('222');
             if(booklist) {
                 res.json(booklist);
                 return
             }
         } catch(err) {
-            console.info(err, '444');
             res.json(err)
         }
     }
+
+    //删除指定文章根据id
+    async RemoveBookById(req, res, next) {
+        const id = req.body.id, dataInfo = {};
+        if(id) {
+            dataInfo.code = 1,
+            dataInfo.message = '缺少必要参数',
+            res.json(dataInfo);
+            return false
+        };
+        try{
+            await Books.remove({ _id: id });
+            dataInfo.code = 0,
+            dataInfo.message = '删除小说成功',
+            res.json(dataInfo);
+        } catch(err) {
+            res.json(err)
+        }
+    }
+
     //显示分类列表
     async BookTypeList(req, res, next) {
         try {

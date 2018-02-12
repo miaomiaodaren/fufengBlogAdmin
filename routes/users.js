@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var isUser = require('../models/user');
+var path = require('path');
 
 var http = require('http');
 var captchapng = require('captchapng');
@@ -10,7 +11,7 @@ var crypto = require('crypto');
 var superagent = require('superagent');
 
 var multer  = require('multer');
-var upload = multer({ dest: '../public/uploads/' });
+var upload = multer({ dest: path.resolve(__dirname, '../public/uploads') });
 
 
 // //在文件上传的时候需要使用的中间件, 可以使用req.files读取到数据信息
@@ -19,7 +20,7 @@ var upload = multer({ dest: '../public/uploads/' });
 
 
 import Users from '../controller/user.js'
-import uploads from '../common/multerUtil';
+import { uploads } from '../common/multerUtil';
 
 /* 返回统一格式 */
 var resData = {};
@@ -47,7 +48,10 @@ router.get('/login', function(req, res, next) {
 router.get('/weixin', Users.getweixintoken);
 
 //图片上传尝试
-router.post('/uploader', uploads.single('file'), Users.imgUploader);
+//upload.single  接受一个以XX命名的文件; 这边前端写入了avatar
+//multer 组件的话,会在req.query里面给你添加一个file 或 files的属性，里面包含了传入的文件   当然目前只支持单文(后期添加多文件上传)
+//https://github.com/expressjs/multer/blob/master/doc/README-zh-cn.md
+router.post('/uploader', uploads.single('avatar'), Users.imgUploader);
 
 //用户注册(同时兼容GET/POST二种接口)
 router.all('/UserReginer', Users.reginer);

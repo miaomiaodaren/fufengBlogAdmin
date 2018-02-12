@@ -75,7 +75,10 @@ router.post('/getZlist', function(req, res, next) {
 })
 
 //获取指定章内容
-router.post('/showcontent', anBooks.GetContentById)
+router.post('/showcontent', anBooks.GetContentById);
+
+//删除指定说
+router.post('/removebook', anBooks.RemoveBookById);
 
 router.get('/deleteBook', function(req, res, next) {
     books.remove({}).then(function() {
@@ -311,6 +314,12 @@ async function fb(url) {
         console.info(err, 'woshierr');
     }
 }
+
+
+
+//2018-2-12 之前项目是把整本小说内容都放在数据库中，在读取数据的时候，导致速度很慢，所以是打算构思，只把章节与书名一些小的放在数据库
+//中，而内容这种以txt的文件格式存储。
+
 
 // stfb();
 

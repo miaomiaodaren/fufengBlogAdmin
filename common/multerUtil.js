@@ -1,9 +1,11 @@
-const muletr = require('multer');
+const multer = require('multer');
+const path = require('path');
 
-let storage = muletr.diskStorage({
+let storage = multer.diskStorage({
     //设置上传文件路径, uploads文件夹会自生成
-    destinaton: function(req, file, cb) {
-        cb(null, './public/uploads')
+    destination: function(req, file, cb) {
+        console.info(path.resolve(__dirname, '../public/uploads'), 99, cb);
+        cb(null, path.resolve(__dirname, '../public/uploads'))
     },
     //给上传文件重命名，获取添加后辍名
     filename: function(req, file, cb) {
@@ -12,7 +14,7 @@ let storage = muletr.diskStorage({
     }
 });
 
-export default muletr({
+export const uploads = multer({
     storage: storage,
     // limits: {}
 })
