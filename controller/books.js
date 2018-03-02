@@ -10,8 +10,7 @@ class anBooks {
     //显示所有的小说数据  .pretty() 格式化输出
     async getBookList(req, res, next) {
         try {
-            let booklist = await Books.find({}, {"title": 1, "author": 1, "type": 1, "addtime": 1,"_id": 1});
-            console.info('222');
+            let booklist = await Books.find({}, {"title": 1, "author": 1, "type": 1, "addtime": 1,"img": 1, "bookid": 1});
             if(booklist) {
                 res.json(booklist);
                 return

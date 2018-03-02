@@ -22,24 +22,11 @@ function reconvert(str) {
     return str
 }
 
-async function fetchUrl(url, callback, id) {
-    // try{
-    //     let fetchU = await superagent.get(url).charset('gbk'), $ = cheerio.load(fetchU.text), content = reconvert($("#content").html());
-    //     console.log('正在抓取的是', url);
-    //     var obj = {
-    //         id: id,
-    //         err: 0,
-    //         bookName: $('.footer_cont a').text(),
-    //         title: $('.bookname h1').text(),
-    //         content: content
-    //     }
-    //     callback(null, obj)
-    // } catch(err) {
-    //     console.info(err)
-    // }
-    superagent.get(url).charset('gbk').end(function(err, res) {
-        var $ = cheerio.load(res.text);
-        var content = reconvert($("#content").html());
+async function fetchUrl(url, callback, id, bookid) {
+    try {
+        let res = await superagent.get(url).charset('gbk'),
+            $ = cheerio.load(res.text),
+            content = reconvert($("#content").html());
         //分析结构后分割html
         // const arr = []
         // const contentArr = content.split('<br><br>')
@@ -56,8 +43,12 @@ async function fetchUrl(url, callback, id) {
             content: content
         }
         console.info('第' + id + '章抓取成功！');
+        fs.writeFileSync(`${BOOKPATH}${bookid}/${id}.json`, JSON.stringify(obj), 'utf8');
+        console.info('第' + id + '章生成成功！');
         callback(null, obj)
-    })
+    } catch(err) {
+        console.info(err)
+    }
 }
 
 router.get('/showbook', anBooks.getBookList);
@@ -65,9 +56,8 @@ router.get('/showbook', anBooks.getBookList);
 //获取章节列表
 router.post('/getZlist', function(req, res, next) {
     var id = req.body.id;
-    console.info(req.body, 'wodetian');
     if(id) {
-        Books.findOne({_id: id}, {"title": 1, "_id": 1, "author": 1, "jianjie": 1, "zview.title": 1, "zview.id": 1}).then(function(info) {
+        Books.findOne({bookid: id}, {"title": 1, "author": 1, "jianjie": 1, "chapter.title": 1, "chapter.id": 1}).then(function(info) {
             res.json(info);
             return
         })
@@ -96,7 +86,7 @@ function download_img(url, filename) {
         encoding: 'binary'
     }, function(error, resoponse, body) {
         fs.writeFile(IMAGE_DIR + '/'+ filename +'.jpg', body, 'binary', function(err) {
-            console.info('图片下载完成');
+            console.info('图片下载成功');
         });
     })
 }
@@ -301,7 +291,7 @@ async function fb(url) {
                         author: author,
                         jianjie: jianjie,
                         zview: results,
-                        img: bookid,
+                        img: bookid, 
                         type: types
                     });
                     addbook.save();
@@ -319,8 +309,104 @@ async function fb(url) {
 
 //2018-2-12 之前项目是把整本小说内容都放在数据库中，在读取数据的时候，导致速度很慢，所以是打算构思，只把章节与书名一些小的放在数据库
 //中，而内容这种以txt的文件格式存储。
+//2018-2-24 新记, 由于只生成一个文件的话,不方便缓存，所以打算是写成一个章节一个文件，并且打算把最章节也保存到数据库中，方便拿到上一章，下一章
+router.get('/newSaveBook', async function(req, res, next) {
+    const newNovel = 'https://www.zwdu.com/book/19636/';
+    try {
+        const book_html = await superagent.get(newNovel).charset('gbk');
+        let $ = cheerio.load(book_html.text),
+            title = reconvert($('#info h1').html()),        //小说的标题
+            // author = reconvert($('#info p').eq(0).split(':')[1]),       //小说的作者
+            about = reconvert($('#intro').html()),
+            chapter = $('#list dd');
+        console.info(88, $('#info p').eq(0).html().split(':'));
+    } catch(err) {
+        console.info(err, '223');
+    }
+    
+    res.json({code: 1, data: '我是傻逼'})
+})
 
 
+const BOOKPATH = './public/books/',
+    BDEMOPATH = 'https://www.zwdu.com/book/19636/',
+    MODE = '0777';  //创建文件的默认权限， 读写权限
+async function newsaveBook(PATH) {
+    id = 0;
+    const newNovel = PATH;
+    try {
+        const book_html = await superagent.get(newNovel).charset('gbk');
+        let $ = cheerio.load(book_html.text),
+            title = reconvert($('#info h1').html()),        //小说的标题
+            author = reconvert($('#info p').eq(0).html()).split('：')[1],       //小说的作者
+            about = reconvert($('#intro').html()),
+            types = $('.con_top a').eq(1).attr('href').split('/')[1],  //小说的类型
+            bookid = newNovel.split('/')[4],     //小说的独有id
+            chapter_href = [];
+        //如果小说已经存在数据库中了，就直接返回
+        Books.findOne({ bookid: bookid }).then(info => {
+            if(info) return false
+            $('#list dl dd').each(function(i, v) {
+                // if(i > 10) return false
+                //此处v返回的是node对象，需要用$再封装一次
+                let n = {}, $chapter = $(v);
+                n.src = 'http://www.zwdu.com' + $chapter.find('a').attr('href');        //章节地址
+                n.title = $chapter.find('a').text();            //章节名称
+                chapter_href.push(n)
+            });
+            //新建一个文件夹(此处使用了同步创建文件夹)  fs.exists是用来检测文件夹是否存在
+            fs.exists(`${BOOKPATH}${bookid}`, (exists) => {
+                if(!exists) {
+                    fs.mkdirSync(`${BOOKPATH}${bookid}`, '0777');
+                }
+                //在文件夹已经生成成功之后，生成相应的小说封面图片
+                // await download_img($('#fmimg img').attr('src'), bookid);
+                //mapLimit 第三个参数是把第一个参数的每一项去执行，最后执行结果返回给第四个参数
+                async1.mapLimit(chapter_href, 5, function(url, callback) {
+                    id++
+                    fetchUrl(url['src'], callback, id, bookid)
+                }, function(err, results) {
+                    let newBook = {
+                        title: title,
+                        author: author,
+                        about: about,
+                        chapter: results,
+                        img: bookid,
+                        type: types
+                    };
+                    //在写入的时候，由于有中文，要使用utf8格式，不然会出现乱码
+                    //往已经存在的文件里追加内容 只需要 第三个参数 options.flag 设置为 'a' 时,就会变成追加内容
+                    //在最后生成一个all，也就是全本的小说
+                    fs.writeFile(`${BOOKPATH}${bookid}/all.json`, JSON.stringify(newBook), 'utf8', async function(err) {
+                        if(!err) {
+                            var addbook = new Books({
+                                title: title,
+                                author: author,
+                                jianjie: about,
+                                img: bookid + '.jpg', 
+                                type: types,
+                                bookid: bookid,
+                                chapter: results,
+                            });
+                            await addbook.save();
+                        }
+                    });
+                    console.info('又吃一鸡！！！');
+                })
+            });
+        })
+    } catch(err) {
+        console.info(err, '223');
+    }
+}
+
+// var iconv = require('iconv-lite'); 
+// var JsonObj = JSON.parse(fs.readFileSync(BOOKPATH + '19636.json',  {encoding: 'utf8'}));
+// var buf = new Buffer(JsonObj, 'binary');
+// var str = iconv.decode(buf, 'GBK'); 
+// console.info(JSON.stringify(JsonObj), 889);
+
+// newsaveBook(BDEMOPATH);
 // stfb();
 
 module.exports = router;

@@ -1,13 +1,15 @@
 var mongodb = require('./mongodb');
 var Schema = mongodb.mongoose.Schema;
+//2018-2-23新增 去掉了章节的字段，改为从json文件读取
 var BookTitleSchema = new Schema({
     title : String,     //小说名字
     author : String,      //作者
     jianjie: String,    //简介
     addtime: String,    //更新时间
-    zview: Array,     //章节标题 + 章节内容
     type: String,        //小说属于的类别
-    img: String     //头像
+    img: String,     //头像
+    bookid: Number,     //bookid
+    chapter: Array,     //章节列表
 });
 
 var BookType = new Schema({
