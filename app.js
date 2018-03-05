@@ -14,6 +14,7 @@ var users = require('./routes/users');
 var types = require('./routes/typeinfo');
 var news = require('./routes/news');
 var books = require('./routes/books');
+var lineage = require('./routes/lineage');
 
 var config = require('./config/config.json');
 var wxutil = require('./common/wxutil.js');
@@ -72,6 +73,7 @@ app.use('/users', users);
 app.use('/types', types);
 app.use('/news', news);
 app.use('/books', books);
+app.use('/lineage', lineage);
 
 //假如在访问/b 开头的路由的时候，匹配小说网站的
 app.get('/book', function(req, res) {

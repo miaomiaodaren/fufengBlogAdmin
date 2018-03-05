@@ -23,3 +23,6 @@ var BookType = new Schema({
 
 export const Books = mongodb.mongoose.model("Books", BookTitleSchema);
 export const BooksType = mongodb.mongoose.model('BookType', BookType);
+
+
+//如果new Scheme({xx},  { collection: 'user'}) 不带第二个参数，他会在后面加一个s, 比如这个会生成成books, 所以要带上第二个参数
